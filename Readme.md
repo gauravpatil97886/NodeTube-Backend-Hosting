@@ -2,7 +2,7 @@
 
 ## Summary:
 
-Welcome to our Advanced Video Hosting Backend project! This comprehensive backend system is meticulously crafted using Node.js, Express.js, MongoDB, Mongoose, JWT, Bcrypt, and other cutting-edge technologies. Our goal with this project is to provide you with a robust foundation for building a video hosting website similar to YouTube, complete with essential features such as user authentication, video uploading, engagement metrics (likes, dislikes, comments, replies), subscription management, and more.
+Welcome to our Advanced Video Hosting Backend initiative! This sophisticated backend infrastructure has been meticulously developed using cutting-edge technologies such as Node.js, Express.js, MongoDB, Mongoose, JWT, Bcrypt, and others. Our objective with this endeavor is to furnish you with a sturdy framework for constructing a video hosting platform akin to YouTube. It encompasses indispensable features including user authentication, video uploading, engagement metrics (likes, dislikes, comments, replies), subscription management, and more. I've extensively worked on the backend, gaining practical insights into its operation at a production level. This journey has been immensely gratifying, providing me with comprehensive knowledge about backend intricacies
 
 ## Backend Data Model (Data Modeling)
 
