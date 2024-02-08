@@ -1,6 +1,8 @@
+// Importing required modules
 import mongoose, { Schema } from "mongoose";
-import jwt from "jsonwebtoken"
-import bcrypt from "bcrypt" //6 43
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
+
 // Define the UserSchema
 const UserSchema = new Schema({
     // Unique identifier for the user
@@ -21,7 +23,7 @@ const UserSchema = new Schema({
         trim: true // Trimming whitespace from the input
     },
     // Full name of the user
-    fullname: {
+    fullName: {
         type: String,
         required: true,
         unique: true,
@@ -39,7 +41,6 @@ const UserSchema = new Schema({
     },
     // Array to store the user's watch history
     watchHistory: [{
-        type: String, // IDs of the watched videos
         type: Schema.Types.ObjectId, // Reference to Video schema
         ref: "Video"
     }],
@@ -53,6 +54,49 @@ const UserSchema = new Schema({
         type: String
     }
 }, { timestamps: true }); // Automatically add createdAt and updatedAt timestamps
+
+// Middleware to hash the password before saving
+UserSchema.pre("save", async function(next) {
+    if (this.isModified("password")) {
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+// Method to verify if the entered password matches the stored hashed password
+UserSchema.methods.isPasswordCorrect = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+// Method to generate an access token for user authentication
+UserSchema.methods.generateAccessToken = function() {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            fullName: this.fullName
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {
+            expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+        }
+    );
+};
+
+// Method to generate a refresh token for user authentication
+UserSchema.methods.generateRefreshToken = function() {
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            fullName: this.fullName
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {
+            expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+        }
+    );
+};
 
 // Define the User model
 export const User = mongoose.model("User", UserSchema);
