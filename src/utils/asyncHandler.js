@@ -9,9 +9,7 @@ const asyncHandler = (requestHandler) => {
     };
 };
 
-// Export the asyncHandler function
-export { asyncHandler };
-
+export { asyncHandler }
 
 
 ``
