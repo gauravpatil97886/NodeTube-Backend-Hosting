@@ -1,8 +1,6 @@
-// Importing the Router class from the Express library
 import { Router } from "express";
+import { registerUser } from "../controllers/usercontroller.js";
+const router=Router()
 
-// Creating an instance of the Router class
-const router = Router();
-
-// Exporting the router instance as the default export
-export default router;
+router.route("/register").post(registerUser)
+export default router

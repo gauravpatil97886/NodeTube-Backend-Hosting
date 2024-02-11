@@ -8,7 +8,7 @@ const app = express();
 // Enable CORS with specified options
 app.use(cors({
   origin: process.env.CORS_ORIGIN, // Set the allowed origin from environment variable
-  credentials: true // Allow credentials to be included in requests
+  credentials: true 
 }));
 
 // Parse incoming JSON data with a specified limit
@@ -27,6 +27,13 @@ app.use(express.urlencoded({
 
 // Parse cookies attached to the request
 app.use(cookieParser());
+
+ 
+import userRouter from './routes/user.route.js'; // Assuming the correct filename and path
+
+// Mounting the userRouter at the correct URL path
+app.use("/api/v1/users", userRouter)
+
 
 // Export the Express application instance
 export { app };

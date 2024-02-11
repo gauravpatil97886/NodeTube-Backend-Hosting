@@ -1,15 +1,20 @@
-// Define a function named asyncHandler that takes a requestHandler function as an argument
 const asyncHandler = (requestHandler) => {
-    // Return a new function that serves as middleware for Express routes
     return (req, res, next) => {
-        // Execute the requestHandler function and wrap it in a Promise
         Promise.resolve(requestHandler(req, res, next))
-            // If the promise resolves successfully, do nothing
-            .catch((err) => next(err)); // If the promise rejects (throws an error), pass that error to the next middleware or error handler
-    };
-};
+            .catch((err) => next(err));
+    }
+}
 
 export { asyncHandler }
+
+
+
+
+
+
+
+
+
 
 
 ``
