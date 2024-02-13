@@ -1,102 +1,110 @@
-// Importing required modules
-import mongoose, { Schema } from "mongoose"; // Importing mongoose for MongoDB interaction
-import jwt from "jsonwebtoken"; // Importing jsonwebtoken for token generation
-import bcrypt from "bcrypt"; // Importing bcrypt for password hashing
+import mongoose, { Schema } from "mongoose";
+import jwt from "jsonwebtoken";
+import bcrypt from "bcrypt";
 
-// Define the UserSchema
-const UserSchema = new Schema({
-    // Unique identifier for the user
-    id: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true,
-        index: true // Indexing for faster retrieval
+const userSchema = new Schema(
+  {
+    username: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true
     },
-    // Email of the user
     email: {
-        type: String,
-        required: true,
-        unique: true,
-        lowercase: true,
-        trim: true // Trimming whitespace from the input
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
     },
-    // Full name of the user
     fullName: {
-        type: String,
-        required: true,
-        unique: true,
-        trim: true,
-        index: true // Indexing for faster retrieval
+      type: String,
+      required: true,
+      trim: true,
+      index: { unique: true, sparse: true } // Adding unique sparse index to fullName field
     },
-    // URL for the user's avatar image stored in Cloudinary
     avatar: {
-        type: String, // Cloudinary URL
-        required: true
+      type: String,
+      required: true// cloudinary url
     },
-    // URL for the user's cover image
     coverImage: {
-        type: String
+      type: String, // cloudinary url
     },
-    // Array to store the user's watch history
-    watchHistory: [{
-        type: Schema.Types.ObjectId, // Reference to Video schema
+    watchHistory: [
+      {
+        type: Schema.Types.ObjectId,
         ref: "Video"
-    }],
-    // Password for the user account
+      }
+    ],
     password: {
-        type: String,
-        required: [true, 'password is required'] // Error message if password is missing
+      type: String,
+      required: [true, 'Password is required for the account'] // Improved error message
     },
-    // Refresh token for user authentication
     refreshToken: {
-        type: String
+      type: String
     }
-}, { timestamps: true }); // Automatically add createdAt and updatedAt timestamps
 
-// Middleware to hash the password before saving
-UserSchema.pre("save", async function(next) {
-    if (this.isModified("password")) {
-        this.password = await bcrypt.hash(this.password, 10); // Hashing the password with bcrypt
-    }
+  },
+  {
+    timestamps: true
+  }
+);
+
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+
+  try {
+    this.password = await bcrypt.hash(this.password, 10);
     next();
+  } catch (error) {
+    return next(error);
+  }
 });
 
-// Method to verify if the entered password matches the stored hashed password
-UserSchema.methods.isPasswordCorrect = async function(password) {
-    return await bcrypt.compare(password, this.password); // Comparing the entered password with the stored hashed password
+userSchema.methods.isPasswordCorrect = async function(password){
+  try {
+    return await bcrypt.compare(password, this.password);
+  } catch (error) {
+    return false;
+  }
 };
 
-// Method to generate an access token for user authentication
-UserSchema.methods.generateAccessToken = function() {
+userSchema.methods.generateAccessToken = function(){
+  try {
     return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            fullName: this.fullName
-        },
-        process.env.ACCESS_TOKEN_SECRET, // Using environment variable for access token secret
-        {
-            expiresIn: process.env.ACCESS_TOKEN_EXPIRY // Setting expiration for access token
-        }
+      {
+        _id: this._id,
+        email: this.email,
+        username: this.username,
+        fullName: this.fullName
+      },
+      process.env.ACCESS_TOKEN_SECRET,
+      {
+        expiresIn: process.env.ACCESS_TOKEN_EXPIRY
+      }
     );
+  } catch (error) {
+    return null;
+  }
 };
 
-// Method to generate a refresh token for user authentication
-UserSchema.methods.generateRefreshToken = function() {
+userSchema.methods.generateRefreshToken = function(){
+  try {
     return jwt.sign(
-        {
-            _id: this._id,
-            email: this.email,
-            fullName: this.fullName
-        },
-        process.env.REFRESH_TOKEN_SECRET, // Using environment variable for refresh token secret
-        {
-            expiresIn: process.env.REFRESH_TOKEN_EXPIRY // Setting expiration for refresh token
-        }
+      {
+        _id: this._id,
+        
+      },
+      process.env.REFRESH_TOKEN_SECRET,
+      {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRY
+      }
     );
+  } catch (error) {
+    return null;
+  }
 };
 
-// Define the User model
-export const User = mongoose.model("User", UserSchema); // Creating User model using UserSchema
+export const User = mongoose.model("User", userSchema);

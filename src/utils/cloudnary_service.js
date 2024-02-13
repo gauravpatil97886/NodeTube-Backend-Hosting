@@ -1,39 +1,31 @@
-// Importing necessary modules
-import { v2 as cloudinary } from 'cloudinary';
-import { response } from 'express';
-import fs from 'fs';
+import {v2 as cloudinary} from "cloudinary"
+import fs from "fs"
 
-// Configuration for Cloudinary
+
 cloudinary.config({ 
-  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, // Using process.env to access environment variables
-  api_key: process.env.CLOUDINARY_API_KEY,
-  api_secret: process.env.CLOUDINARY_API_SECRET,
+  cloud_name: process.env.CLOUDINARY_CLOUD_NAME, 
+  api_key: process.env.CLOUDINARY_API_KEY, 
+  api_secret: process.env.CLOUDINARY_API_SECRET 
 });
 
-// Function to upload file on Cloudinary
 const uploadOnCloudinary = async (localFilePath) => {
     try {
-        // Check if localFilePath is provided
-        if (!localFilePath) {
-            console.log("Could not find path");
-            return null; // Returning null if path is not provided
-        }
-
-        // Upload file on Cloudinary
+        if (!localFilePath) return null
+        //upload the file on cloudinary
         const response = await cloudinary.uploader.upload(localFilePath, {
-            resource_type: "auto" // Setting resource type to auto
-        });
+            resource_type: "auto"
+        })
+        // file has been uploaded successfull
+        //console.log("file is uploaded on cloudinary ", response.url);
+        fs.unlinkSync(localFilePath)
+        return response;
 
-        // File has been uploaded successfully
-        console.log("File uploaded successfully: ", response.url);
-        return response.url; // Returning the URL of the uploaded file
     } catch (error) {
-        // Remove the locally saved temporary files if the upload operation fails
-        fs.unlinkSync(localFilePath);
-        console.error("Error occurred during upload:", error);
-        return null; // Returning null in case of error
+        fs.unlinkSync(localFilePath) // remove the locally saved temporary file as the upload operation got failed
+        return null;
     }
 }
 
-// Exporting the uploadOnCloudinary function
-export { uploadOnCloudinary };
+
+
+export {uploadOnCloudinary}
