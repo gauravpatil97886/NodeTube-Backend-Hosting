@@ -4,7 +4,9 @@ import { verifyJWT } from "../middlewares/auth.middleware.js";
 import { 
   loginUser, 
   logoutUser, 
-  registerUser,refreshAccessToken} from "../controllers/usercontroller.js";
+  registerUser,refreshAccessToken 
+} from "../controllers/usercontroller.js";
+
 
 const router = Router();
 
